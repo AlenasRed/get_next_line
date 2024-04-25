@@ -85,7 +85,7 @@ char	*get_buffer(int fd)
 		return (NULL);
 	buffer[0] = '\0';
 	r = read(fd, temp, BUFFER_SIZE);
-	while (r || r != -1)
+	while (r && r != -1)
 	{
 		temp[r] = '\0';
 		buffer = ft_strjoin(buffer, temp);
