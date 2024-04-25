@@ -66,8 +66,10 @@ char	*next(char *buffer)
 		pos++;
 	}
 	if (buffer[pos] == '\n')
+	{
+		pos++;
 		line[i++] = '\n';
-	pos++;
+	}
 	line[i] = '\0';
 	return (line);
 }
