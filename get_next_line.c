@@ -6,7 +6,7 @@
 /*   By: mserjevi <mserjevi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/17 19:43:10 by mserjevi          #+#    #+#             */
-/*   Updated: 2024/04/30 17:05:11 by mserjevi         ###   ########.fr       */
+/*   Updated: 2024/04/30 20:00:21 by mserjevi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 // struct for buffer
 char	*get_next_line(int fd)
 {
-	char			*line;
+	char		*line;
 	static int		current_fd = -1;
 
 	if (current_fd == -1)
@@ -63,39 +63,55 @@ char	*next(char *buffer)
 
 char	*next(int fd)
 {
-	char		*line;
-	static char	*temp;
-	int			r;
+	char		*line ;
+	static char	*temp = NULL;
+	//char 		*temp1;
+	static int	r;
 
-	temp = (char *) malloc(sizeof(char) * (BUFFER_SIZE + 1));
+	if (!temp)
+		temp = (char *) malloc(sizeof(char) * (BUFFER_SIZE + 1));
 	if (!temp)
 		return (NULL);
 	r = get_buffer(temp, fd);
+	/*if (line)
+	{
+		free(line);
+		line = NULL;
+	}*/
+	//if (!line)
 	line = (char *) malloc(sizeof(char) * 1);
 	if (!line)
 	{
-		free(temp);
+		if (temp)
+			free(temp);
 		return (NULL);
 	}
-	line[0] = '\0';
+	if (line)
+		line[0] = '\0';
 	while (r && r != -1)
 	{
+		//temp1 = line;
 		line = ft_strjoin(line, temp, r);
+		//free(temp1);
+		if (!line)
+			return (NULL);
 		if (temp[r - 1] == '\n')
 			return (line);
 		r = get_buffer(temp, fd);
 		if (r == 0)
 			return (line);
 	}
-	free(line);
-	if (!temp)
+	if (line)
+		free(line);
+	if (temp)
 		free(temp);
+	temp = NULL;
 	return (NULL);
 }
 
 int	get_buffer(char *buff, int fd)
 {
-	static int		r = 0;
+	static int		r = 1;
 	int				i;
 	static char		*temp = NULL;
 	static int		pos = 0;
@@ -104,9 +120,9 @@ int	get_buffer(char *buff, int fd)
 		temp = (char *) malloc(sizeof(char) * BUFFER_SIZE);
 	if (!temp)
 		return (0);
-	if (!pos)
+	if (!pos && r > 0)
 	{
-		clear_temp(temp);
+		clear_temp(temp, r);
 		r = read(fd, temp, BUFFER_SIZE);
 	}
 	i = 0;
@@ -127,11 +143,14 @@ int	get_buffer(char *buff, int fd)
 	}
 	else
 		pos = 0;
-	if (r <= 0)
+	if (r <= 0 && temp)
+	{
 		free (temp);
+		temp = NULL;
+	}
 	return (i);
 }
-
+/*
 #include <stdio.h>
 #include <fcntl.h>
 
@@ -156,4 +175,4 @@ int	main(void)
 		//printf("c: %d r: %d", c, r);
 	}
 	close (id);
-}
+}*/

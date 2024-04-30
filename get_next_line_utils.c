@@ -6,7 +6,7 @@
 /*   By: mserjevi <mserjevi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/17 19:48:42 by mserjevi          #+#    #+#             */
-/*   Updated: 2024/04/30 15:34:51 by mserjevi         ###   ########.fr       */
+/*   Updated: 2024/04/30 19:59:12 by mserjevi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,16 +56,19 @@ void	ft_strcpyf(char *dst, char *src)
 char	*ft_strjoin(char *s1, char *s2, size_t l2)
 {
 	size_t	l1;
-	//size_t	l2;
 	size_t	i;
 	char	*str;
 
+	if (!s1)
+		return (NULL);
 	l1 = ft_strlen(s1);
-	//l2 = ft_strlen(s2);
 	i = 0;
 	str = (char *) malloc (sizeof(char) * (l1 + l2 + 1));
 	if (str == NULL)
+	{
+		free(s1);
 		return (NULL);
+	}
 	while (i < l1)
 	{
 		str[i] = s1[i];
@@ -81,12 +84,12 @@ char	*ft_strjoin(char *s1, char *s2, size_t l2)
 	return (str);
 }
 
-void	clear_temp(char *temp)
+void	clear_temp(char *temp, int r)
 {
 	int	i;
 
 	i = 0;
-	while (i < BUFFER_SIZE)
+	while (i < r)
 	{
 		temp[i] = 0;
 		i++;
