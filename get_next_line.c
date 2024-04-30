@@ -6,7 +6,7 @@
 /*   By: mserjevi <mserjevi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/17 19:43:10 by mserjevi          #+#    #+#             */
-/*   Updated: 2024/04/25 13:50:02 by mserjevi         ###   ########.fr       */
+/*   Updated: 2024/04/30 17:05:11 by mserjevi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,46 +63,72 @@ char	*next(char *buffer)
 
 char	*next(int fd)
 {
-	char	*line;
-	char	temp[BUFFER_SIZE + 1];
-	int		r;
+	char		*line;
+	static char	*temp;
+	int			r;
 
+	temp = (char *) malloc(sizeof(char) * (BUFFER_SIZE + 1));
+	if (!temp)
+		return (NULL);
 	r = get_buffer(temp, fd);
 	line = (char *) malloc(sizeof(char) * 1);
 	if (!line)
+	{
+		free(temp);
 		return (NULL);
+	}
 	line[0] = '\0';
 	while (r && r != -1)
 	{
 		line = ft_strjoin(line, temp, r);
-		if(temp[r - 1] == '\n')
+		if (temp[r - 1] == '\n')
 			return (line);
 		r = get_buffer(temp, fd);
 		if (r == 0)
 			return (line);
 	}
 	free(line);
+	if (!temp)
+		free(temp);
 	return (NULL);
 }
 
 int	get_buffer(char *buff, int fd)
 {
-	int		r;
-	int		i;
-	char	c;
+	static int		r = 0;
+	int				i;
+	static char		*temp = NULL;
+	static int		pos = 0;
 
-	r = read(fd, &c, 1);
-	i = 0;
-	while(r > 0 && c != '\n')
+	if (!temp)
+		temp = (char *) malloc(sizeof(char) * BUFFER_SIZE);
+	if (!temp)
+		return (0);
+	if (!pos)
 	{
-		buff[i] = c;
-		i++;
-		if (i >= BUFFER_SIZE)
-			break ;
-		r = read(fd, &c, 1);
+		clear_temp(temp);
+		r = read(fd, temp, BUFFER_SIZE);
 	}
-	if (c == '\n')
-		buff[i++] = c;
+	i = 0;
+	while (r > 0 && pos < r && temp[pos] != '\n' )
+	{
+		buff[i] = temp[pos];
+		i++;
+		pos++;
+		if (i >= r)
+			break ;
+	}
+	if (r > 0 && pos < r && temp[pos] == '\n')
+	{
+		buff[i++] = temp[pos];
+		pos++;
+		if (pos >= r)
+			pos = 0;
+	}
+	else
+		pos = 0;
+	if (r <= 0)
+		free (temp);
 	return (i);
 }
 
@@ -113,10 +139,9 @@ int	main(void)
 {
 	int id;
 	char *arr;
-	int	r;
 
 	//printf("runed \n");
-	id = open("test.txt", O_RDONLY);
+	id = open("test1.txt", O_RDONLY);
 	arr = get_next_line(id);
 	printf("arr %s", arr);
 	while (arr != NULL)
@@ -129,7 +154,6 @@ int	main(void)
 		printf("arr inside %s", arr);
 		//r = read(id, &c, 1);
 		//printf("c: %d r: %d", c, r);
-
 	}
 	close (id);
 }

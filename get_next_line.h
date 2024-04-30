@@ -6,7 +6,7 @@
 /*   By: mserjevi <mserjevi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/17 19:48:48 by mserjevi          #+#    #+#             */
-/*   Updated: 2024/04/25 13:18:25 by mserjevi         ###   ########.fr       */
+/*   Updated: 2024/04/30 14:49:25 by mserjevi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,5 +28,6 @@ size_t	ft_strlen(const char *s);
 void	ft_strcpyf(char *dst, char *src);
 char	*next(int fd);
 char	*ft_strjoin(char *s1, char *s2, size_t l2);
-int     get_buffer(char *buff, int fd);
+int		get_buffer(char *buff, int fd);
+void 	clear_temp(char *temp);
 #endif

@@ -6,11 +6,12 @@
 /*   By: mserjevi <mserjevi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/17 19:48:42 by mserjevi          #+#    #+#             */
-/*   Updated: 2024/04/25 13:18:04 by mserjevi         ###   ########.fr       */
+/*   Updated: 2024/04/30 15:34:51 by mserjevi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
+#include <stdio.h>
 #include <stdlib.h>
 
 size_t ft_strlen(const char *s)
@@ -78,4 +79,16 @@ char	*ft_strjoin(char *s1, char *s2, size_t l2)
 	str[i] = '\0';
 	free(s1);
 	return (str);
+}
+
+void	clear_temp(char *temp)
+{
+	int	i;
+
+	i = 0;
+	while (i < BUFFER_SIZE)
+	{
+		temp[i] = 0;
+		i++;
+	}
 }
