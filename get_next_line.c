@@ -12,40 +12,27 @@
 
 #include "get_next_line.h"
 #include <stdlib.h>
-//#include <stdio.h>
+#include <stdio.h>
 // struct for buffer
 char	*get_next_line(int fd)
 {
-	static char		*buffer = NULL;
 	char			*line;
 	static int		current_fd = -1;
 
 	if (current_fd == -1)
 		current_fd = fd;
-	if (fd < 0 || fd > 20 || BUFFER_SIZE <= 0)
-	{
-		//close(fd);
+	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (NULL);
-	}
-	if (buffer == NULL)
-		buffer = get_buffer(fd);
+
 
 	if (fd != current_fd)
-	{
-		free(buffer);
 		return (NULL);
-	}
-	if (!buffer)
-		return (NULL);
-	line = next(buffer);
+	line = next(fd);
 	if (!line)
-	{
-		free(buffer);
 		return (NULL);
-	}
 	return (line);
 }
-
+/*
 char	*next(char *buffer)
 {
 	char		*line;
@@ -72,37 +59,53 @@ char	*next(char *buffer)
 	}
 	line[i] = '\0';
 	return (line);
-}
+}*/
 
-char	*get_buffer(int fd)
+char	*next(int fd)
 {
-	char	*buffer;
-	char	*temp;
+	char	*line;
+	char	temp[BUFFER_SIZE + 1];
 	int		r;
 
-	r = 1;
-	temp = (char *) malloc(sizeof(char) * (BUFFER_SIZE + 1));
-	buffer = (char *) malloc(sizeof(char) * (BUFFER_SIZE + 1));
-	if (!temp || !buffer)
+	r = get_buffer(temp, fd);
+	line = (char *) malloc(sizeof(char) * 1);
+	if (!line)
 		return (NULL);
-	buffer[0] = '\0';
-	r = read(fd, temp, BUFFER_SIZE);
+	line[0] = '\0';
 	while (r && r != -1)
 	{
-		temp[r] = '\0';
-		buffer = ft_strjoin(buffer, temp);
-		r = read(fd, temp, BUFFER_SIZE);
+		line = ft_strjoin(line, temp, r);
+		if(temp[r - 1] == '\n')
+			return (line);
+		r = get_buffer(temp, fd);
 		if (r == 0)
-		{
-			free(temp);
-			return (buffer);
-		}
+			return (line);
 	}
-	free(buffer);
-	free(temp);
+	free(line);
 	return (NULL);
 }
-/*
+
+int	get_buffer(char *buff, int fd)
+{
+	int		r;
+	int		i;
+	char	c;
+
+	r = read(fd, &c, 1);
+	i = 0;
+	while(r > 0 && c != '\n')
+	{
+		buff[i] = c;
+		i++;
+		if (i >= BUFFER_SIZE)
+			break ;
+		r = read(fd, &c, 1);
+	}
+	if (c == '\n')
+		buff[i++] = c;
+	return (i);
+}
+
 #include <stdio.h>
 #include <fcntl.h>
 
@@ -110,16 +113,23 @@ int	main(void)
 {
 	int id;
 	char *arr;
+	int	r;
 
 	//printf("runed \n");
-	id = open("test1.txt", O_RDONLY);
+	id = open("test.txt", O_RDONLY);
 	arr = get_next_line(id);
 	printf("arr %s", arr);
 	while (arr != NULL)
 	{
+
+		//char c = 0;
+		//r = read(id, &c, 1);
+		//printf("c: %d r: %d", c, r);
 		arr = get_next_line(id);
 		printf("arr inside %s", arr);
+		//r = read(id, &c, 1);
+		//printf("c: %d r: %d", c, r);
 
 	}
 	close (id);
-}*/
+}

@@ -18,7 +18,7 @@
 # include <unistd.h>
 
 # ifndef BUFFER_SIZE
-#  define BUFFER_SIZE 10
+#  define BUFFER_SIZE 42
 # endif
 
 char	*get_next_line(int fd);
@@ -26,7 +26,7 @@ size_t	line_lenght(const char *s);
 int		get_char(char *buffer);
 size_t	ft_strlen(const char *s);
 void	ft_strcpyf(char *dst, char *src);
-char	*next(char *buffer);
-char	*ft_strjoin(char *s1, char *s2);
-char	*get_buffer(int fd);
+char	*next(int fd);
+char	*ft_strjoin(char *s1, char *s2, size_t l2);
+int     get_buffer(char *buff, int fd);
 #endif
