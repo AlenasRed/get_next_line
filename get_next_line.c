@@ -17,16 +17,10 @@
 char	*get_next_line(int fd)
 {
 	char		*line;
-	static int		current_fd = -1;
 
-	if (current_fd == -1)
-		current_fd = fd;
-	if (fd < 0 || BUFFER_SIZE <= 0)
+	if (fd < 0 || fd > 20 || BUFFER_SIZE <= 0)
 		return (NULL);
 
-
-	if (fd != current_fd)
-		return (NULL);
 	line = next(fd);
 	if (!line)
 		return (NULL);
@@ -64,15 +58,16 @@ char	*next(char *buffer)
 char	*next(int fd)
 {
 	char		*line ;
-	static char	*temp = NULL;
+	static char	*temp[20];
 	//char 		*temp1;
 	static int	r;
 
-	if (!temp)
-		temp = (char *) malloc(sizeof(char) * (BUFFER_SIZE + 1));
-	if (!temp)
+	if (!temp[fd])
+		temp[fd] = (char *) malloc(sizeof(char) * (BUFFER_SIZE + 1));
+	if (!temp[fd])
 		return (NULL);
-	r = get_buffer(temp, fd);
+	r = get_buffer(temp[fd], fd);
+   // printf("R : %d\n", r);
 	/*if (line)
 	{
 		free(line);
@@ -82,30 +77,32 @@ char	*next(int fd)
 	line = (char *) malloc(sizeof(char) * 1);
 	if (!line)
 	{
-		if (temp)
-			free(temp);
+		if (temp[fd])
+			free(temp[fd]);
 		return (NULL);
 	}
 	if (line)
 		line[0] = '\0';
-	while (r && r != -1)
+	while (r > 0)
 	{
 		//temp1 = line;
-		line = ft_strjoin(line, temp, r);
+		line = ft_strjoin(line, temp[fd], r);
 		//free(temp1);
 		if (!line)
 			return (NULL);
-		if (temp[r - 1] == '\n')
+		if (temp[fd][r - 1] == '\n')
 			return (line);
-		r = get_buffer(temp, fd);
+		r = get_buffer(temp[fd], fd);
 		if (r == 0)
 			return (line);
 	}
 	if (line)
 		free(line);
-	if (temp)
-		free(temp);
-	temp = NULL;
+    if (temp[fd])
+    {
+		free(temp[fd]);
+	    temp[fd] = NULL;
+    }
 	return (NULL);
 }
 
@@ -113,40 +110,50 @@ int	get_buffer(char *buff, int fd)
 {
 	static int		r = 1;
 	int				i;
-	static char		*temp = NULL;
+	static char		*temp[20];
 	static int		pos = 0;
 
-	if (!temp)
-		temp = (char *) malloc(sizeof(char) * BUFFER_SIZE);
-	if (!temp)
+	if (!temp[fd])
+		temp[fd] = (char *) malloc(sizeof(char) * BUFFER_SIZE);
+	if (!temp[fd])
 		return (0);
 	if (!pos && r > 0)
 	{
-		clear_temp(temp, r);
-		r = read(fd, temp, BUFFER_SIZE);
+		clear_temp(temp[fd], r);
+		r = read(fd, temp[fd], BUFFER_SIZE);
+        if (r == -1)
+        {
+            free (temp[fd]);
+		    temp[fd] = NULL;
+            r = 1;
+            return (-1);
+        }
 	}
 	i = 0;
-	while (r > 0 && pos < r && temp[pos] != '\n' )
+	while (r > 0 && pos < r && temp[fd][pos] != '\n' )
 	{
-		buff[i] = temp[pos];
+		buff[i] = temp[fd][pos];
 		i++;
 		pos++;
 		if (i >= r)
 			break ;
 	}
-	if (r > 0 && pos < r && temp[pos] == '\n')
+	if (r > 0 && pos < r && temp[fd][pos] == '\n')
 	{
-		buff[i++] = temp[pos];
+		buff[i++] = temp[fd][pos];
 		pos++;
 		if (pos >= r)
 			pos = 0;
 	}
 	else
 		pos = 0;
-	if (r <= 0 && temp)
+	if (r <= 0 && temp[fd])
 	{
-		free (temp);
-		temp = NULL;
+		free (temp[fd]);
+		temp[fd] = NULL;
+        if (r == -1)
+            return (-1);
+        r = 1;
 	}
 	return (i);
 }
@@ -163,7 +170,23 @@ int	main(void)
 	id = open("test1.txt", O_RDONLY);
 	arr = get_next_line(id);
 	printf("arr %s", arr);
+
 	while (arr != NULL)
+	{
+
+		//char c = 0;
+		//r = read(id, &c, 1);
+		//printf("c: %d r: %d", c, r);
+		arr = get_next_line(id);
+		printf("arr inside %s", arr);
+		//r = read(id, &c, 1);
+		//printf("c: %d r: %d", c, r);
+	}
+    close(id);
+	id = open("test1.txt", O_RDONLY);
+    arr = get_next_line(id);
+	printf("arr %s", arr);
+    while (arr != NULL)
 	{
 
 		//char c = 0;
