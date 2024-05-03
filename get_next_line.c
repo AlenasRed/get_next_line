@@ -6,7 +6,7 @@
 /*   By: mserjevi <mserjevi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/17 19:43:10 by mserjevi          #+#    #+#             */
-/*   Updated: 2024/05/03 16:27:38 by mserjevi         ###   ########.fr       */
+/*   Updated: 2024/05/03 17:47:04 by mserjevi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,26 +44,26 @@ char	*get_next_line(int fd)
 
 char	*next(int fd, char *temp, char *buff)
 {
-	int		r;
-	int		l;
+	int		temp_len;
+	int		line_len;
 	char	*line;
 
-	l = 0;
+	line_len = 0;
 	line = (char *) malloc(sizeof(char) * (BUFFER_SIZE + 1));
 	if (!line)
 		return (NULL);
-	r = get_buff_line(fd, temp, buff);
+	temp_len = get_buff_line(fd, temp, buff);
 	line[0] = '\0';
-	while (r > 0)
+	while (temp_len > 0)
 	{
-		line = ft_strjoin(line, temp, l, r);
-		l += r;
+		line = ft_strjoin(line, temp, line_len, temp_len);
+		line_len += temp_len;
 		if (!line)
 			return (NULL);
-		if (temp[r - 1] == '\n')
+		if (temp[temp_len - 1] == '\n')
 			return (line);
-		r = get_buff_line(fd, temp, buff);
-		if (r == 0)
+		temp_len = get_buff_line(fd, temp, buff);
+		if (temp_len == 0)
 			return (line);
 	}
 	free(line);
@@ -72,27 +72,27 @@ char	*next(int fd, char *temp, char *buff)
 
 int	get_buff_line(int fd, char *temp, char *buff)
 {
-	static int		r = 1;
+	static int		read_len = 1;
 	int				i;
-	static int		pos = 0;
+	static int		buff_pos = 0;
 
-	if (!pos && r > 0 && clear_temp(buff, r))
-		r = read(fd, buff, BUFFER_SIZE);
+	if (!buff_pos && read_len > 0 && clear_temp(buff, read_len))
+		read_len = read(fd, buff, BUFFER_SIZE);
 	i = 0;
-	while (r > 0 && pos < r && buff[pos] != '\n' )
-		temp[i++] = buff[pos++];
-	if (r > 0 && pos < r && buff[pos] == '\n')
+	while (read_len > 0 && buff_pos < read_len && buff[buff_pos] != '\n' )
+		temp[i++] = buff[buff_pos++];
+	if (read_len > 0 && buff_pos < read_len && buff[buff_pos] == '\n')
 	{
-		temp[i++] = buff[pos++];
-		if (pos >= r)
-			pos = 0;
+		temp[i++] = buff[buff_pos++];
+		if (buff_pos >= read_len)
+			buff_pos = 0;
 	}
 	else
-		pos = 0;
-	if (r <= 0)
+		buff_pos = 0;
+	if (read_len <= 0)
 	{
-		i = r;
-		r = 1;
+		i = read_len;
+		read_len = 1;
 	}
 	return (i);
 }
