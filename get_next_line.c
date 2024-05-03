@@ -6,7 +6,7 @@
 /*   By: mserjevi <mserjevi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/17 19:43:10 by mserjevi          #+#    #+#             */
-/*   Updated: 2024/05/03 16:25:00 by mserjevi         ###   ########.fr       */
+/*   Updated: 2024/05/03 16:27:38 by mserjevi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,20 +29,14 @@ char	*get_next_line(int fd)
 	if (!buff[fd])
 		buff[fd] = (char *) malloc(sizeof(char) * BUFFER_SIZE);
 	if (!buff[fd])
-	{
-		temp[fd] = free_mem(temp[fd]);
-		temp[fd] = NULL;
-		return (NULL);
-	}
+		return (temp[fd] = free_mem(temp[fd]));
 	line = next(fd, temp[fd], buff[fd]);
 	if (!line)
 	{
 		if (temp[fd])
-			free(temp[fd]);
+			temp[fd] = free_mem(temp[fd]);
 		if (buff[fd])
-			free(buff[fd]);
-		temp[fd] = NULL;
-		buff[fd] = NULL;
+			buff[fd] = free_mem(buff[fd]);
 		return (NULL);
 	}
 	return (line);
