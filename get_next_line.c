@@ -96,35 +96,3 @@ int	get_buff_line(int fd, char *temp, char *buff)
 	}
 	return (i);
 }
-/*
-#include <stdio.h>
-#include <fcntl.h>
-
-int	main(void)
-{
-	int id;
-	char *arr;
-
-	id = open("test1.txt", O_RDONLY);
-	arr = get_next_line(id);
-	printf("arr %s", arr);
-	free(arr);
-	while (arr != NULL)
-	{
-		arr = get_next_line(id);
-		printf("arr inside %s", arr);
-		free(arr);
-	}
-    close(id);
-    id = open("test1.txt", O_RDONLY);
-	arr = get_next_line(id);
-	printf("arr %s", arr);
-	free(arr);
-	while (arr != NULL)
-	{
-		arr = get_next_line(id);
-		printf("arr inside %s", arr);
-		free(arr);
-	}
-    close(id);
-}*/
